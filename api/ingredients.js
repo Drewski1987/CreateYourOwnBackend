@@ -3,10 +3,15 @@ import express from "express"
 const ingredientsRouter = express.Router()
 export default ingredientsRouter
 
+
+// Get /ingredient
+
 ingredientsRouter.route("/").get(async (req, res)=>{
     const ingredients = await getIngredientsIncludingRecipe()
     res.send(ingredients)
 })
+
+//Get /ingredient/:id 
 
 ingredientsRouter.route("/:id").get(async(req, res)=>{
     const id = Number(req.params.id)
@@ -16,6 +21,8 @@ ingredientsRouter.route("/:id").get(async(req, res)=>{
         return res.status(404).send("There is no ingredient with that id")
     }
 })
+
+// Post /ingredient
 
 ingredientsRouter.route("/").post(async(req, res)=>{
     const id = Number(req.params.id)
@@ -37,3 +44,57 @@ ingredientsRouter.route("/").post(async(req, res)=>{
     res.status(201).send(newIngredient)
     
 })
+ 
+// Delete /ingredients/:id
+
+ingredientsRouter.route("/:id").delete(async(req, res)=>{
+    const id = Number(req.params.id)
+
+    if (!isValidId(id)){
+        return res.status(400).send("ID must be valid")
+    }
+    const deleteIngredient = await deleteIngredient(id)
+
+    if (!deleteIngredient){
+        return res.status(404).send("Recipe not found")
+    }
+    res.sendStatus(204)
+})
+
+// /PUT /ingredients/:id 
+
+ingredientsRouter.route("/:id").put(async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!isValidId(id)) {
+    return res.status(400).send( "ID must be a valid" );
+  }
+
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).send( "Missing body");
+  }
+
+  const {name, quantity, recipe_id} = req.body;
+
+  if (!name || !quantity || recipe_id === undefined) {
+    return res.status(400).send("Missing required fields" );
+  }
+
+  const ingredient = await getIngredient(id);
+  if (!ingredient) {
+    return res.status(404).send( "Ingredient not found");
+  }
+
+  const updatedIngredient = await updateIngredient({
+    id,
+    name,
+    quantity,
+    recipeId: recipe_id,
+  });
+
+  if (!updatedIngredient) {
+    return res.status(404).send( "Ingredient not found" );
+  }
+
+  res.send(updatedIngredient);
+});

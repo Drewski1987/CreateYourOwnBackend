@@ -1,3 +1,4 @@
+import { isValidElement } from "react";
 import { createRecipe, getRecipes, getRecipesByIDFromIngredients } from "../db/queries/recipes";
 import express from "express"
 const recipesRouter= express.Router()
@@ -39,3 +40,57 @@ recipesRouter.route("/:id").post(async(req, res)=>{
     const newRecipe = await createRecipe({title, instructions, prep_time})
     res.status(201).send(newRecipe)
 })
+
+
+// Delete /recipe/:id
+recipesRouter.route("/:id").delete(async(req, res)=>{
+    const id = Number(req.params.id)
+
+    if (!isValidId(id)){
+        return res.status(400).send("ID must be valid")
+    }
+    const deleteRecipe = await deleteRecipe(id)
+
+    if (!deleteRecipe){
+        return res.status(404).send("Recipe not found")
+    }
+    res.sendStatus(204)
+})
+
+// /PUT /recipes/:id 
+
+recipesRouter.route("/:id").put(async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!isValidId(id)) {
+    return res.status(400).send( "ID must be a valid" );
+  }
+
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).send( "Missing body");
+  }
+
+  const {title, instructions, prep_time} = req.body;
+
+  if (!title || !instructions || !prep_time === undefined) {
+    return res.status(400).send("Missing required fields" );
+  }
+
+  const recipe = await getRecipe(id);
+  if (!recipe) {
+    return res.status(404).send( "Recipe not found");
+  }
+
+  const updatedRecipe = await updateRecipe({
+    id,
+    title,
+    instructions,
+    prep_time,
+  });
+
+  if (!updatedRecipe) {
+    return res.status(404).send( "Recipe not found" );
+  }
+
+  res.send(updatedRecipe);
+});
