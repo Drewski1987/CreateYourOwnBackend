@@ -1,0 +1,33 @@
+{
+  "name": "createyourownbackend",
+  "main": "server.js",
+  "type": "module",
+  "imports": {
+    "#*": "./*.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch --env-file=.env server.js",
+    "db:schema": "psql -d ingredients -f db/schema.sql",
+    "db:seed": "node --env-file=.env db/seed.js",
+    "db:reset": "npm run db:schema && npm run db:seed"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Drewski1987/CreateYourOwnBackend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Drewski1987/CreateYourOwnBackend/issues"
+  },
+  "homepage": "https://github.com/Drewski1987/CreateYourOwnBackend#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.0",
+    "seed": "^0.4.4"
+  },
+  "version": "1.0.0",
+  "description": ""
+}
