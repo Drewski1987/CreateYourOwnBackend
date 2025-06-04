@@ -1,5 +1,6 @@
-import { createIngredient, getIngredientsIncludingRecipe } from "../db/queries/ingredients";
+import { createIngredient, getIngredientsIncludingRecipe, deleteIngredient, getIngredient, updateIngredient } from "../db/queries/ingredients";
 import express from "express"
+import { verifyToken } from "../auth";
 const ingredientsRouter = express.Router()
 export default ingredientsRouter
 
@@ -24,7 +25,7 @@ ingredientsRouter.route("/:id").get(async(req, res)=>{
 
 // Post /ingredient
 
-ingredientsRouter.route("/").post(async(req, res)=>{
+ingredientsRouter.route("/").post(verifyToken, async(req, res)=>{
     const id = Number(req.params.id)
     const foundIngredient = await getIngredientsIncludingRecipe(id)
 
@@ -47,15 +48,15 @@ ingredientsRouter.route("/").post(async(req, res)=>{
  
 // Delete /ingredients/:id
 
-ingredientsRouter.route("/:id").delete(async(req, res)=>{
+ingredientsRouter.route("/:id").delete(verifyToken, async(req, res)=>{
     const id = Number(req.params.id)
 
     if (!isValidId(id)){
         return res.status(400).send("ID must be valid")
     }
-    const deleteIngredient = await deleteIngredient(id)
+    const removeIngredient = await deleteIngredient(id)
 
-    if (!deleteIngredient){
+    if (!removeIngredient){
         return res.status(404).send("Recipe not found")
     }
     res.sendStatus(204)
@@ -63,7 +64,7 @@ ingredientsRouter.route("/:id").delete(async(req, res)=>{
 
 // /PUT /ingredients/:id 
 
-ingredientsRouter.route("/:id").put(async (req, res) => {
+ingredientsRouter.route("/:id").put(verifyToken, async (req, res) => {
   const id = Number(req.params.id);
 
   if (!isValidId(id)) {

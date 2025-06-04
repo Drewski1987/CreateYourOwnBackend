@@ -1,6 +1,7 @@
-import { isValidElement } from "react";
-import { createRecipe, getRecipes, getRecipesByIDFromIngredients } from "../db/queries/recipes";
+
+import { createRecipe, getRecipes, getRecipesByIDFromIngredients, updateRecipe, deleteRecipe } from "../db/queries/recipes";
 import express from "express"
+import { verifyToken } from "../auth";
 const recipesRouter= express.Router()
 export default recipesRouter
 
@@ -22,7 +23,7 @@ recipesRouter.route("/:id").get(async(req, res)=>{
 
 //POST /recipes/:id/
 
-recipesRouter.route("/:id").post(async(req, res)=>{
+recipesRouter.route("/:id").post(verifyToken,async(req, res)=>{
     const id = Number (req.params.id)
     const foundRecipe = await getRecipesByIDFromIngredients(id)
 
@@ -43,15 +44,15 @@ recipesRouter.route("/:id").post(async(req, res)=>{
 
 
 // Delete /recipe/:id
-recipesRouter.route("/:id").delete(async(req, res)=>{
+recipesRouter.route("/:id").delete(verifyToken,async(req, res)=>{
     const id = Number(req.params.id)
 
     if (!isValidId(id)){
         return res.status(400).send("ID must be valid")
     }
-    const deleteRecipe = await deleteRecipe(id)
+    const removeRecipe = await deleteRecipe(id)
 
-    if (!deleteRecipe){
+    if (!removeRecipe){
         return res.status(404).send("Recipe not found")
     }
     res.sendStatus(204)
@@ -59,7 +60,7 @@ recipesRouter.route("/:id").delete(async(req, res)=>{
 
 // /PUT /recipes/:id 
 
-recipesRouter.route("/:id").put(async (req, res) => {
+recipesRouter.route("/:id").put(verifyToken,async (req, res) => {
   const id = Number(req.params.id);
 
   if (!isValidId(id)) {
@@ -81,16 +82,16 @@ recipesRouter.route("/:id").put(async (req, res) => {
     return res.status(404).send( "Recipe not found");
   }
 
-  const updatedRecipe = await updateRecipe({
+  const renewRecipe = await updateRecipe({
     id,
     title,
     instructions,
     prep_time,
   });
 
-  if (!updatedRecipe) {
+  if (!renewRecipe) {
     return res.status(404).send( "Recipe not found" );
   }
 
-  res.send(updatedRecipe);
+  res.send(renewRecipe);
 });

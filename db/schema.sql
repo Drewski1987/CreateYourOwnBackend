@@ -1,5 +1,15 @@
 DROP TABLE IF EXISTS recipes CASCADE;
 DROP TABLE IF EXISTS ingredients;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT,
+    email TEXT NOT NULL,
+    password TEXT NOT NULL
+
+);
 
 CREATE TABLE recipes (
     id SERIAL PRIMARY KEY,
@@ -15,3 +25,4 @@ CREATE TABLE ingredients (
     recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE
     
 );
+
