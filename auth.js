@@ -29,7 +29,7 @@ app.post('/ingredients/register', async(req, res, next) => {
     return res.status(402).send('Could not create the new user');
     }
     
-    const token = jwt.sign({id: addUser.id, name: addUser.name}, process.env.JWT_SECRET);
+    const token = jwt.sign({id: addUser.id, email: addUser.email, name: addUser.name}, process.env.JWT_SECRET);
     res.status(201).json(token);
 });
 
